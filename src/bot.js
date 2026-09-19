@@ -6,6 +6,7 @@ import { createEntitlementService } from './entitlements.js';
 import { createNineRouterAdapter } from './ninerouter.js';
 
 const money = (n) => `Rp ${Number(n).toLocaleString('id-ID')}`;
+const formatDate = (value) => new Intl.DateTimeFormat('id-ID', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(value)) + ' WIB';
 const adminOnly = (ctx, next) => config.adminIds.size > 0 && config.adminIds.has(Number(ctx.from?.id)) ? next() : ctx.reply(`Akses admin ditolak. ID Telegram kamu: ${ctx.from?.id}.`);
 
 export function createBot() {
@@ -23,10 +24,10 @@ export function createBot() {
     if (!orderId) return ctx.reply('Format: /paid ORDER_ID');
     const order = await markPaid(orderId);
     if (!order) return ctx.reply('Order tidak ditemukan.');
-    if (String(order.productId).startsWith('demo-api-') || order.delivery === 'api_key') {
+    if (String(order.productId).startsWith('api-key-') || order.delivery === 'api_key') {
       try {
         const entitlement = await entitlements.provision(order);
-        return ctx.reply(`Order paid ✅\nAPI key 9Router untuk ${order.id}:\n\n<code>${entitlement.apiKey}</code>\n\nBerlaku sampai: ${entitlement.expiresAt}`, { parse_mode: 'HTML' });
+        return ctx.reply(`Order paid ✅\nAPI key 9Router untuk ${order.id}:\n\n<code>${entitlement.apiKey}</code>\n\nBerlaku sampai: ${formatDate(entitlement.expiresAt)}`, { parse_mode: 'HTML' });
       } catch (error) {
         return ctx.reply(`Payment tercatat, tetapi provisioning API key gagal: ${error.message}`);
       }
