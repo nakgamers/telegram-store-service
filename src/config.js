@@ -18,6 +18,8 @@ export const config = Object.freeze({
   port: positiveInt(process.env.PORT, 8788),
   expiryMinutes: positiveInt(process.env.ORDER_EXPIRY_MINUTES, 15),
   currency: process.env.CURRENCY || 'IDR',
+  nineRouterBaseUrl: (process.env.NINE_ROUTER_BASE_URL || '').replace(/\/$/, ''),
+  nineRouterPassword: String(process.env.NINE_ROUTER_PASSWORD || '').trim(),
 });
 
 export function assertRuntime({ requireBot = false } = {}) {

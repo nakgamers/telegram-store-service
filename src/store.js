@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import { config } from './config.js';
 
 const demoProducts = [
+  { id: 'demo-api-starter', name: '9Router API Starter 30 Hari', type: 'api_access', price: 15000, description: 'API key 9Router untuk akses model AI, masa aktif entitlement 30 hari.', delivery: 'api_key' },
+  { id: 'demo-api-pro', name: '9Router API Pro 30 Hari', type: 'api_access', price: 50000, description: 'API key 9Router Pro, masa aktif entitlement 30 hari.', delivery: 'api_key' },
   { id: 'demo-hotspot', name: 'Paket Setup Hotspot', type: 'service', price: 150000, description: 'Konfigurasi hotspot dan captive portal 9Router.', delivery: 'manual' },
   { id: 'demo-voucher-1d', name: 'Voucher WiFi 1 Hari', type: 'voucher', price: 5000, description: 'Kode akses internet sekolah/rumah selama 1 hari.', delivery: 'code' },
   { id: 'demo-monitoring', name: 'Monitoring Router Bulanan', type: 'subscription', price: 25000, description: 'Monitoring dasar dan laporan status router.', delivery: 'manual' },
