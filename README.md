@@ -58,13 +58,22 @@ Untuk production, Telegram user wajib menekan `/start` terlebih dahulu. Bot tida
 
 ## Integrasi 9Router
 
-Tahap berikutnya:
+Endpoint provisioning sudah dipetakan ke 9Router:
 
-1. Sambungkan `DATABASE_URL` ke database backend web.
-2. Isi `store_products` dengan produk 9Router.
-3. Tambahkan API adapter ke order web.
-4. Buat delivery adapter untuk voucher/config `.rsc`/WireGuard atau instruksi setup.
-5. Tambahkan webhook payment dan idempotency ledger.
-6. Tambahkan admin CRUD yang membaca katalog web.
+```text
+POST https://router.nandz.qzz.io/api/auth/login
+POST https://router.nandz.qzz.io/api/keys
+PUT  https://router.nandz.qzz.io/api/keys/:id
+DELETE https://router.nandz.qzz.io/api/keys/:id
+```
 
-Jangan menyimpan Bot Token, payment API key, database URL, atau secret delivery di Git.
+Set environment production di host bot (jangan commit):
+
+```env
+NINE_ROUTER_BASE_URL=https://router.nandz.qzz.io
+NINE_ROUTER_PASSWORD=<password-9router>
+ENTITLEMENT_ENCRYPTION_KEY=<random-secret-minimal-32-char>
+```
+
+API key 9Router tidak memiliki quota/expiration native, jadi service menyimpan entitlement dan menonaktifkan key saat entitlement expired. Jangan menjalankan provisioning production sebelum `PAYMENT_PROVIDER` dan webhook/polling pembayaran sudah dikonfigurasi.
+
