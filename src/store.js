@@ -96,8 +96,9 @@ export async function updateOrderPayment(orderId, paymentReference) {
 
 export async function getOrder(orderId) {
   if (!pool) return memory.orders.get(orderId) || null;
-  const { rows } = await dbQuery('SELECT id,telegram_id AS "telegramId",product_id AS "productId",quantity,total,status,delivery,expires_at AS "expiresAt",payment_reference AS "paymentReference",paid_at AS "paidAt",delivered_at AS "deliveredAt" FROM store_orders WHERE id=$1', [orderId]);
-  return rows[0] || null;
+  const { rows } = await dbQuery('SELECT o.id,o.telegram_id AS "telegramId",o.product_id AS "productId",p.name AS "productName",p.type AS "productType",p.duration_days AS "durationDays",o.quantity,o.total,o.status,o.delivery,o.expires_at AS "expiresAt",o.payment_reference AS "paymentReference",o.paid_at AS "paidAt",o.delivered_at AS "deliveredAt" FROM store_orders o JOIN store_products p ON p.id=o.product_id WHERE o.id=$1', [orderId]);
+  if (!rows[0]) return null;
+  return { ...rows[0], durationDays: Number(rows[0].durationDays ?? rows[0].duration_days ?? 1) };
 }
 
 export async function markPaid(orderId) {
