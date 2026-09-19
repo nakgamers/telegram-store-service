@@ -30,5 +30,4 @@ export const config = Object.freeze({
 
 export function assertRuntime({ requireBot = false } = {}) {
   if (requireBot && !config.botToken) throw new Error('BOT_TOKEN kosong; set .env sebelum menjalankan bot.');
-  if (requireBot && config.adminIds.size === 0) throw new Error('ADMIN_TELEGRAM_IDS kosong; service menolak start tanpa allowlist admin.');
 }
