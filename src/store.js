@@ -30,6 +30,12 @@ export async function initStore() {
       total BIGINT NOT NULL, status TEXT NOT NULL, payment_reference TEXT UNIQUE, delivery TEXT NOT NULL DEFAULT 'manual',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), expires_at TIMESTAMPTZ NOT NULL, paid_at TIMESTAMPTZ, delivered_at TIMESTAMPTZ
     );
+    CREATE TABLE IF NOT EXISTS store_entitlements (
+      id TEXT PRIMARY KEY, order_id TEXT NOT NULL UNIQUE REFERENCES store_orders(id), telegram_id BIGINT NOT NULL,
+      product_id TEXT NOT NULL, api_key_id TEXT NOT NULL, api_key_ciphertext TEXT NOT NULL,
+      starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), expires_at TIMESTAMPTZ NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), revoked_at TIMESTAMPTZ
+    );
   `);
   for (const product of demoProducts) {
     await pool.query(`INSERT INTO store_products (id,name,type,price,description,delivery) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO NOTHING`, [product.id, product.name, product.type, product.price, product.description, product.delivery]);
