@@ -1,6 +1,6 @@
 import { Markup, Telegraf } from 'telegraf';
 import { config } from './config.js';
-import { createOrder, getOrder, listProducts, markDelivered, markPaid, updateOrderPayment, upsertUser } from './store.js';
+import { createOrder, listProducts, markPaid, updateOrderPayment, upsertUser } from './store.js';
 import { createPayment } from './payment.js';
 
 const money = (n) => `Rp ${Number(n).toLocaleString('id-ID')}`;
@@ -15,7 +15,7 @@ export function createBot() {
   bot.action('catalog', async (ctx) => { await ctx.answerCbQuery(); await showCatalog(ctx); });
   bot.action(/^buy:(.+)$/, async (ctx) => { await ctx.answerCbQuery(); await beginOrder(ctx, ctx.match[1]); });
   bot.command('order', async (ctx) => ctx.reply('Gunakan /katalog untuk memilih produk.'));
-  bot.command('paid', adminOnly, async (ctx) => { const orderId = ctx.message.text.split(/\s+/)[1]; if (!orderId) return ctx.reply('Format: /paid ORDER_ID'); const order = await markPaid(orderId); if (!order) return ctx.reply('Order tidak ditemukan.'); await deliver(ctx, order); });
+  bot.command('paid', adminOnly, async (ctx) => { const orderId = ctx.message.text.split(/\s+/)[1]; if (!orderId) return ctx.reply('Format: /paid ORDER_ID'); const order = await markPaid(orderId); if (!order) return ctx.reply('Order tidak ditemukan.'); return ctx.reply(`Order ${order.id} ditandai paid. Delivery belum otomatis; hubungkan delivery adapter 9Router sebelum production.`); });
   bot.command('orders', adminOnly, async (ctx) => ctx.reply('Admin order dashboard akan terhubung ke API web pada tahap berikutnya.'));
   bot.action('home', async (ctx) => { await ctx.answerCbQuery(); await ctx.reply(`Menu ${config.storeName}`, menu()); });
   return bot;
