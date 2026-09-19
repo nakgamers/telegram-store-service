@@ -48,7 +48,7 @@ export async function initStore() {
     CREATE TABLE IF NOT EXISTS store_orders (id TEXT PRIMARY KEY, telegram_id BIGINT NOT NULL, product_id TEXT NOT NULL, quantity INTEGER NOT NULL, total BIGINT NOT NULL, status TEXT NOT NULL, payment_reference TEXT UNIQUE, delivery TEXT NOT NULL DEFAULT 'manual', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), expires_at TIMESTAMPTZ NOT NULL, paid_at TIMESTAMPTZ, delivered_at TIMESTAMPTZ);
     CREATE TABLE IF NOT EXISTS store_entitlements (id TEXT PRIMARY KEY, order_id TEXT NOT NULL UNIQUE REFERENCES store_orders(id), telegram_id BIGINT NOT NULL, product_id TEXT NOT NULL, api_key_id TEXT NOT NULL, api_key_ciphertext TEXT NOT NULL, starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), expires_at TIMESTAMPTZ NOT NULL, status TEXT NOT NULL DEFAULT 'active', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), revoked_at TIMESTAMPTZ);
   `;
-  await dbQuery(schema);
+  for (const statement of schema.split(';').map((x) => x.trim()).filter(Boolean)) await dbQuery(statement);
   for (const product of demoProducts) {
     const insert = databaseDriver === 'mysql'
       ? 'INSERT IGNORE INTO store_products (id,name,type,price,description,delivery) VALUES (?,?,?,?,?,?)'
@@ -115,4 +115,4 @@ export async function markDelivered(orderId) {
   return getOrder(orderId);
 }
 
-export function storeSnapshot() { return { mode: pool ? 'postgres' : 'demo', products: memory.products.length, orders: memory.orders.size }; }
+export function storeSnapshot() { return { mode: pool ? databaseDriver : 'demo', products: memory.products.length, orders: memory.orders.size }; }
