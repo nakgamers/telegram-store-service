@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071a33"/><stop offset=".55" stop-color="#0b3b72"/><stop offset="1" stop-color="#09a6c7"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#62e6ff" stop-opacity=".55"/><stop offset="1" stop-color="#62e6ff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" rx="38" fill="url(#bg)"/>
+  <circle cx="1000" cy="100" r="330" fill="url(#glow)"/>
+  <circle cx="920" cy="470" r="240" fill="none" stroke="#8cf2ff" stroke-opacity=".18" stroke-width="3"/>
+  <circle cx="920" cy="470" r="170" fill="none" stroke="#8cf2ff" stroke-opacity=".22" stroke-width="3"/>
+  <path d="M760 470 Q920 270 1080 470 M815 470 Q920 340 1025 470" fill="none" stroke="#d9fbff" stroke-opacity=".8" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="920" cy="470" r="18" fill="#fff"/>
+  <rect x="80" y="78" width="92" height="92" rx="24" fill="#fff" fill-opacity=".13" stroke="#9bf3ff" stroke-width="2"/>
+  <path d="M101 126h50M111 145h30" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="126" cy="105" r="8" fill="#64eaff"/>
+  <text x="80" y="260" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#9bf3ff">NANDZ STORE</text>
+  <text x="80" y="345" font-family="Arial, sans-serif" font-size="76" font-weight="800" fill="#fff">9Router</text>
+  <text x="80" y="420" font-family="Arial, sans-serif" font-size="48" font-weight="600" fill="#d9fbff">AI API ACCESS</text>
+  <text x="80" y="505" font-family="Arial, sans-serif" font-size="25" fill="#c4e8f2">Akses cepat • Aman • Siap digunakan</text>
+</svg>

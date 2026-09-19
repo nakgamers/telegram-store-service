@@ -1,4 +1,6 @@
-import { Markup, Telegraf } from 'telegraf';
+import { Markup, Telegraf, Input } from 'telegraf';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { createOrder, listProducts, markPaid, updateOrderPayment, upsertUser } from './store.js';
 import { createPayment } from './payment.js';
@@ -7,16 +9,27 @@ import { createNineRouterAdapter } from './ninerouter.js';
 
 const money = (n) => `Rp ${Number(n).toLocaleString('id-ID')}`;
 const formatDate = (value) => new Intl.DateTimeFormat('id-ID', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(value)) + ' WIB';
+const bannerPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'assets', '9router-store-banner.png');
 const adminOnly = (ctx, next) => config.adminIds.size > 0 && config.adminIds.has(Number(ctx.from?.id)) ? next() : ctx.reply(`Akses admin ditolak. ID Telegram kamu: ${ctx.from?.id}.`);
 
 export function createBot() {
   const bot = new Telegraf(config.botToken);
   const entitlements = createEntitlementService({ router: createNineRouterAdapter() });
   bot.catch((error, ctx) => { console.error('[BOT ERROR]', error.message); ctx.reply('Terjadi kesalahan sistem.').catch(() => {}); });
-  bot.start(async (ctx) => { await upsertUser({ telegramId: ctx.from.id, username: ctx.from.username, firstName: ctx.from.first_name }); await ctx.reply(`Selamat datang di ${config.storeName}!\n${config.description}`, menu()); });
+  bot.start(async (ctx) => {
+    await upsertUser({ telegramId: ctx.from.id, username: ctx.from.username, firstName: ctx.from.first_name });
+    const name = escapeHtml(ctx.from.first_name || ctx.from.username || 'teman');
+    const greeting = `Halo, <b>${name}</b> 👋\n\nSelamat datang di <b>9Router Store</b>.\nAkses API AI praktis, cepat, dan siap digunakan.\n\nPilih menu di bawah untuk mulai.`;
+    return ctx.replyWithPhoto(Input.fromLocalFile(bannerPath), { caption: greeting, parse_mode: 'HTML', ...menu() });
+  });
   bot.command('id', (ctx) => ctx.reply(`Telegram ID kamu: ${ctx.from.id}`));
   bot.command('katalog', async (ctx) => showCatalog(ctx));
+  bot.command('bantuan', async (ctx) => ctx.reply('Butuh bantuan? Pilih produk di Katalog atau hubungi admin melalui chat ini.'));
   bot.action('catalog', async (ctx) => { await ctx.answerCbQuery(); await showCatalog(ctx); });
+  bot.action('help', async (ctx) => { await ctx.answerCbQuery(); await ctx.reply('Pilih Katalog untuk membeli API key. Setelah pembayaran tervalidasi, key dikirim otomatis ke chat ini.'); });
+  bot.action('id', async (ctx) => { await ctx.answerCbQuery(); await ctx.reply(`ID Telegram kamu: ${ctx.from.id}`); });
+  bot.action('orders', async (ctx) => { await ctx.answerCbQuery(); await ctx.reply('Riwayat pesanan akan tersedia setelah pembayaran QRIS aktif.'); });
+  bot.action('home', async (ctx) => { await ctx.answerCbQuery(); await ctx.reply('Menu utama 9Router Store', menu()); });
   bot.action(/^buy:(.+)$/, async (ctx) => { await ctx.answerCbQuery(); await beginOrder(ctx, ctx.match[1]); });
   bot.command('order', async (ctx) => ctx.reply('Gunakan /katalog untuk memilih produk.'));
   bot.command('paid', adminOnly, async (ctx) => {
@@ -35,11 +48,14 @@ export function createBot() {
     return ctx.reply(`Order ${order.id} ditandai paid. Delivery belum otomatis untuk tipe produk ini.`);
   });
   bot.command('orders', adminOnly, async (ctx) => ctx.reply('Admin order dashboard akan terhubung ke API web pada tahap berikutnya.'));
-  bot.action('home', async (ctx) => { await ctx.answerCbQuery(); await ctx.reply(`Menu ${config.storeName}`, menu()); });
   return bot;
 }
 
-const menu = () => Markup.inlineKeyboard([[Markup.button.callback('📦 Katalog Produk', 'catalog')], [Markup.button.callback('🆔 Cek ID Telegram', 'home')]]);
+const menu = () => Markup.inlineKeyboard([
+  [Markup.button.callback('📦 Beli API Key', 'catalog')],
+  [Markup.button.callback('🧾 Pesanan Saya', 'orders'), Markup.button.callback('🆔 ID Telegram', 'id')],
+  [Markup.button.callback('❓ Bantuan', 'help')],
+]);
 
 async function showCatalog(ctx) {
   const products = await listProducts();
