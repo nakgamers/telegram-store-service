@@ -11,7 +11,7 @@ const payment = await import('../src/payment.js');
 test('demo catalog is available without database credentials', async () => {
   const products = await store.listProducts();
   assert.ok(products.length >= 3);
-  assert.ok(products.some((p) => p.type === 'service'));
+  assert.ok(products.every((p) => p.type === 'api_access'));
 });
 
 test('order payment delivery lifecycle is idempotent enough for demo', async () => {

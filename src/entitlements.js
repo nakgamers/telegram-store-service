@@ -35,7 +35,7 @@ export function createEntitlementService({ router, database = null, clock = () =
         const existing = await database.query('SELECT * FROM store_entitlements WHERE order_id=$1', [order.id]);
         if (existing.rows[0]) return existing.rows[0];
       } else if (demo.has(order.id)) return demo.get(order.id);
-      const expires = new Date(clock().getTime() + 30 * 24 * 60 * 60 * 1000);
+      const expires = new Date(clock().getTime() + Number(order.durationDays || 1) * 24 * 60 * 60 * 1000);
       const key = await router.createKey(`telegram-${order.id}`);
       const entitlement = { id: crypto.randomUUID(), orderId: order.id, telegramId: order.telegramId, productId: order.productId, apiKeyId: key.id, apiKeyCiphertext: encryptSecret(key.key), startsAt: clock().toISOString(), expiresAt: expires.toISOString(), status: 'active', apiKey: key.key };
       if (database) {

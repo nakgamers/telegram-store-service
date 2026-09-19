@@ -6,7 +6,7 @@ import { createEntitlementService } from './entitlements.js';
 import { createNineRouterAdapter } from './ninerouter.js';
 
 const money = (n) => `Rp ${Number(n).toLocaleString('id-ID')}`;
-const adminOnly = (ctx, next) => config.adminIds.has(Number(ctx.from?.id)) ? next() : ctx.reply(`Akses admin ditolak. ID Telegram kamu: ${ctx.from?.id}`);
+const adminOnly = (ctx, next) => config.adminIds.size > 0 && config.adminIds.has(Number(ctx.from?.id)) ? next() : ctx.reply(`Akses admin ditolak. ID Telegram kamu: ${ctx.from?.id}.`);
 
 export function createBot() {
   const bot = new Telegraf(config.botToken);
